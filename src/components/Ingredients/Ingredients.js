@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import api from '../../api'
 import IngredientForm from './IngredientForm'
 import IngredientList from './IngredientList'
 import Search from './Search'
@@ -7,10 +8,14 @@ const Ingredients = () => {
   const [ ingredients, setIngredients ] = useState([])
 
   const addIngredientHandler = ingredient => {
-    setIngredients(prevIngredients => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredient }
-    ])
+    api.post('ingredients.json', ingredient).then(response => {
+      setIngredients(prevIngredients => [
+        ...prevIngredients,
+        { id: response.data.name, ...ingredient }
+      ])
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   const removeIngredientHandler = ingredientId => {
