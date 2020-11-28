@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react'
 import api from '../../api'
-
 import Card from '../UI/Card'
 import './Search.css'
 
 const Search = React.memo(props => {
   const { onLoadIngredients } = props
-  const [ filter, setFilter ] = useState('')
+  const [ searchFilter, setSearchFilter ] = useState('')
   const inputRef = useRef()
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (filter === inputRef.current.value) {
-        const query = filter.length === 0 ? '' : `?orderBy="title"&equalTo="${filter}"`
+      if (searchFilter === inputRef.current.value) {
+        const query = searchFilter.length === 0 ? '' : `?orderBy="title"&equalTo="${searchFilter}"`
         api.get(`ingredients.json${query}`).then(response => {
           const loadedIngredients = []
           for (const key in response.data) {
@@ -31,7 +30,7 @@ const Search = React.memo(props => {
     return () => {
       clearTimeout(timer)
     }
-  }, [filter, onLoadIngredients, inputRef])
+  }, [searchFilter, onLoadIngredients, inputRef])
 
   return (
     <section className='search'>
@@ -41,8 +40,8 @@ const Search = React.memo(props => {
           <input
             ref={inputRef}
             type='text'
-            value={filter}
-            onChange={event => setFilter(event.target.value)} />
+            value={searchFilter}
+            onChange={event => setSearchFilter(event.target.value)} />
         </div>
       </Card>
     </section>
