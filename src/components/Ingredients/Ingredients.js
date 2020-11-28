@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback } from 'react'
+import React, { useReducer, useCallback, useMemo } from 'react'
 import api from '../../api'
 import IngredientForm from './IngredientForm'
 import IngredientList from './IngredientList'
@@ -37,7 +37,7 @@ const Ingredients = () => {
   const [ ingredients, dispatch ] = useReducer(ingredientReducer, [])
   const [ httpState, dispatchHttp ] = useReducer(httpReducer, { loading: false, error: null })
 
-  const addIngredientHandler = ingredient => {
+  const addIngredientHandler = useCallback(ingredient => {
     dispatchHttp({ type: 'SEND' })
     api.post('ingredients.json', ingredient).then(response => {
       dispatch({ type: 'ADD', ingredient: { id: response.data.name, ...ingredient } })
@@ -45,9 +45,9 @@ const Ingredients = () => {
     }).catch(error => {
       dispatchHttp({ type: 'ERROR', error: 'Somthing went wrong!' })
     })
-  }
+  }, [])
 
-  const removeIngredientHandler = ingredientId => {
+  const removeIngredientHandler = useCallback(ingredientId => {
     dispatchHttp({ type: 'SEND' })
     api.delete(`ingredients/${ingredientId}.json`).then(response => {
       dispatch({ type: 'DELETE', id: ingredientId})
@@ -55,24 +55,31 @@ const Ingredients = () => {
     }).catch(error => {
       dispatchHttp({ type: 'ERROR', error: 'Somthing went wrong!' })
     })
-  }
+  }, [])
 
   const filterIngredientsHandler = useCallback(filteredIngredients => {
     dispatch({ type: 'SET', ingredients: filteredIngredients })
   }, [])
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatchHttp({ type: 'CLEAR' })
-  }
+  }, [])
+
+  const ingredientList = useMemo(() => {
+    return (
+      <IngredientList
+        ingredients={ingredients}
+        onRemoveItem={removeIngredientHandler} />
+    )
+  }, [ingredients, removeIngredientHandler])
 
   return (
     <div className='App'>
       {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>}
       <IngredientForm onAddIngredient={addIngredientHandler} loading={httpState.loading} />
-
       <section>
         <Search onLoadIngredients={filterIngredientsHandler} />
-        <IngredientList ingredients={ingredients} onRemoveItem={removeIngredientHandler} />
+        {ingredientList}
       </section>
     </div>
   )
