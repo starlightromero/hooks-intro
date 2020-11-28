@@ -19,9 +19,13 @@ const Ingredients = () => {
   }
 
   const removeIngredientHandler = ingredientId => {
-    setIngredients(prevIngredients =>
-      prevIngredients.filter(ingredient => ingredient.id !== ingredientId)
-    )
+    api.delete(`ingredients/${ingredientId}.json`).then(response => {
+      setIngredients(prevIngredients =>
+        prevIngredients.filter(ingredient => ingredient.id !== ingredientId)
+      )
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   const filterIngredientsHandler = useCallback(filteredIngredients => {
