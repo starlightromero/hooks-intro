@@ -1,6 +1,14 @@
 import { useReducer, useCallback } from 'react'
 import api from '../api'
 
+const initialState = {
+  loading: false,
+  error: null,
+  data: null,
+  extra: null,
+  identifier: null
+}
+
 const httpReducer = (httpState, action) => {
   const { type, error, data, extra, identifier } = action
   switch (type) {
@@ -11,17 +19,16 @@ const httpReducer = (httpState, action) => {
     case 'ERROR':
       return { ...httpState, loading: false, error }
     case 'CLEAR':
-      return { ...httpState, error: null }
+      return initialState
     default:
       throw new Error('Reducer case was not found')
   }
 }
 
 const useHttp = () => {
-  const [ httpState, dispatchHttp ] = useReducer(
-    httpReducer,
-    { loading: false, error: null, data: null, extra: null, identifier: null }
-  )
+  const [ httpState, dispatchHttp ] = useReducer(httpReducer, initialState)
+
+  const clear = useCallback(() => dispatchHttp({ type: 'CLEAR' }), [])
 
   const sendRequest = useCallback(({ url, method, body, extra, identifier }) => {
     dispatchHttp({ type: 'SEND', identifier })
@@ -44,7 +51,8 @@ const useHttp = () => {
     data,
     extra,
     identifier,
-    sendRequest: sendRequest
+    sendRequest: sendRequest,
+    clear
   }
 }
 
