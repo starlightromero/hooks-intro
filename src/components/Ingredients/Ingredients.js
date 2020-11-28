@@ -5,7 +5,7 @@ import IngredientList from './IngredientList'
 import Search from './Search'
 import ErrorModal from '../UI/ErrorModal'
 
-const ingredientReducer = () => (currentIngredients, action) => {
+const ingredientReducer = (currentIngredients, action) => {
   switch (action.type) {
     case 'SET':
       return action.ingredients
